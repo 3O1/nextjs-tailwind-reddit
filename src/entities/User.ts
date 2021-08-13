@@ -26,7 +26,7 @@ export class User extends BaseEntity {
   email: string;
 
   @Index()
-  @Min(3)
+  @Min(3, { message: "Usernames must be at least 3 characters long!" })
   @Max(16)
   @Column({
     unique: true,
