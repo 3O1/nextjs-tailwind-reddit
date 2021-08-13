@@ -4,6 +4,7 @@ import { User } from "./entities/User";
 import express from "express";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 
 /**
  * call dotenv before routes
@@ -19,9 +20,8 @@ const app = express();
 
 app.use(express.json());
 app.use(morgan("dev"));
-
-// middleware before routes
 app.use(trim);
+app.use(cookieParser());
 
 app.get("/", (_, res) => {
   res.send("hello world");

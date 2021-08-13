@@ -78,20 +78,18 @@ const login = async (req: Request, res: Response) => {
       "Set-Cookie",
       cookie.serialize("token", token, {
         /**
-         * httpOnly: cookie cannot be accessed by JS -> more secure
-         *
-         * secure: cookie can only be transferred through https
+         * @param httpOnly: cookie cannot be accessed by JS -> more secure
+         * 
+         * @param secure: cookie can only be transferred through https
          *  - in prod set to true
          *  - false by default
          *  - process.env.NODE_ENV === 'prod'
          *    - if env set to prod -> only https
-         *
-         * sameSite: cookie should only come from our domain
-         *  - 'strict'
-         *
-         * maxAge: expire time of the cookie
-         *
-         * path: tells program where the cookie is valid
+
+         * @param sameSite: cookie should only come from our domain
+         *  - `strict`
+         * @param maxAge: expire time of the cookie
+         * @param path: tells program where the cookie is valid
          * - '/' valid across entire application
          */
         httpOnly: true,
@@ -102,15 +100,83 @@ const login = async (req: Request, res: Response) => {
       })
     );
 
-    return res.json({
-      user,
-      token,
-    });
+    return res.json(user);
   } catch (err) {}
+};
+
+/**
+ * /me route
+ *
+ *  user can send request to this route
+ *  - lets user know if authenticated & who they are
+ *
+ * @throws {Error('Unathenticated')} if token and/or user is null
+ */
+
+const me = async (req: Request, res: Response) => {
+  try {
+    /**
+     * cookie-parser middleware to pass cookies from the request easily
+     */
+    const token = req.cookies.token;
+
+    if (!token) throw new Error("Unathenticated");
+
+    /**
+     * extract username from token
+     *  - throw error if user is not found
+     *  - return user object if no errors/user found
+     */
+    const { username }: any = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findOne({ username });
+    if (!user) throw new Error("Unauthorized");
+
+    return res.json(user);
+  } catch (err) {
+    console.log(err);
+    /**
+     * STATUS_CODE 401 = authorization errors
+     */
+    return res.status(401).json({ error: err.message });
+  }
+};
+
+/**
+ * Logout
+ *
+ *  Can't tell client to delete the cookie
+ *
+ *  - Set a cookie with the exact same name &
+ *  - give it an empty value & immediate expire time
+ *
+ * @param value set to ''
+ * @param [options]
+ *  - expires: immediately
+ * @returns 200 - success: true
+ *
+ * Omit request parameter if not used with `_: Request`
+ */
+
+const logout = (_: Request, res: Response) => {
+  res.set(
+    "Set-Cookie",
+    cookie.serialize("token", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "prod",
+      sameSite: "strict",
+      expires: new Date(0),
+      path: "/",
+    })
+  );
+
+  return res.status(200).json({ success: true });
 };
 
 const router = Router();
 router.post("/register", register);
 router.post("/login", login);
+router.get("/me", me);
+router.get("/logout", logout);
 
 export default router;
