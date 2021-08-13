@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
 import { validate } from "class-validator";
+import bcrypt from "bcrypt";
 
 import { User } from "../entities/User";
 
@@ -7,8 +8,6 @@ const register = async (req: Request, res: Response) => {
   const { email, username, password } = req.body;
 
   try {
-    // TODO: Validate data
-
     // check if username & email are taken
     let errors: any = {};
     const emailUser = await User.findOne({ email });
@@ -23,7 +22,7 @@ const register = async (req: Request, res: Response) => {
       return res.status(400).json(errors);
     }
 
-    // TODO: Create user
+    // Create user
     const user = new User({ email, username, password });
 
     // before saving to db - validate
@@ -39,7 +38,27 @@ const register = async (req: Request, res: Response) => {
   }
 };
 
+const login = async (req: Request, res: Response) => {
+  const { username, password } = req.body;
+
+  try {
+    const user = await User.findOne({ username });
+
+    if (!user) return res.status(404).json({ error: "username not found" });
+
+    const passwordMatches = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatches) {
+      // can either tell user whats invalid or be vague
+      return res.status(401).json({ password: "Password is incorrect" });
+    }
+
+    return res.json(user);
+  } catch (err) {}
+};
+
 const router = Router();
 router.post("/register", register);
+router.post("/login", login);
 
 export default router;
