@@ -1,16 +1,46 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { IsEmail, Max, Min } from "class-validator";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  BaseEntity,
+  Index,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
 @Entity("users")
-export class User {
+export class User extends BaseEntity {
+  constructor(user: Partial<User>) {
+    super();
+    Object.assign(this, user);
+  }
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  firstName: string;
+  @Index()
+  @IsEmail()
+  @Column({
+    unique: true,
+  })
+  email: string;
 
-  @Column()
-  lastName: string;
+  @Index()
+  @Min(3)
+  @Max(16)
+  @Column({
+    unique: true,
+  })
+  username: string;
 
+  @Index()
+  @Min(6)
   @Column()
-  age: number;
+  password: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
