@@ -1,4 +1,4 @@
-import { IsEmail, Max, Min } from "class-validator";
+import { IsEmail, Length } from "class-validator";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -26,15 +26,15 @@ export class User extends BaseEntity {
   email: string;
 
   @Index()
-  @Min(3, { message: "Usernames must be at least 3 characters long!" })
-  @Max(16)
+  @Length(3, 16, { message: "Usernames must be at least 3 characters long!" })
   @Column({
     unique: true,
   })
   username: string;
 
   @Index()
-  @Min(6)
+  // 255 - varchar max
+  @Length(6, 255)
   @Column()
   password: string;
 
