@@ -3,6 +3,13 @@ import { createConnection } from "typeorm";
 import { User } from "./entities/User";
 import express from "express";
 import morgan from "morgan";
+import dotenv from "dotenv";
+
+/**
+ * call dotenv before routes
+ * - process.env available throughout app
+ */
+dotenv.config();
 
 import authRoutes from "./routes/auth";
 
