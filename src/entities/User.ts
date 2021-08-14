@@ -1,27 +1,19 @@
 import { IsEmail, Length } from "class-validator";
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  BaseEntity,
-  Index,
-  CreateDateColumn,
-  UpdateDateColumn,
-  BeforeInsert,
-} from "typeorm";
+import { Entity as TOEntity, Column, Index, BeforeInsert } from "typeorm";
 import bcrypt from "bcrypt";
-import { classToPlain, Exclude } from "class-transformer";
+import { Exclude } from "class-transformer";
 
-@Entity("users")
-export class User extends BaseEntity {
+import Entity from "./Entity";
+
+/**
+ * Declared as `ToEntity` due to the naming conflict of the Entity abstract class created
+ */
+@TOEntity("users")
+export default class User extends Entity {
   constructor(user: Partial<User>) {
     super();
     Object.assign(this, user);
   }
-
-  @Exclude()
-  @PrimaryGeneratedColumn()
-  id: number;
 
   @Index()
   @IsEmail()
@@ -45,21 +37,10 @@ export class User extends BaseEntity {
   @Column()
   password: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
   // hook directive to perform someting before inserted into db
   // hashing password with 6 rounds
   @BeforeInsert()
   async hashPassword() {
     this.password = await bcrypt.hash(this.password, 6);
-  }
-
-  // classToPlain() does the transformation of the model -> goes through and looks what fields have the @Exclude() directives & hides them
-  toJSON() {
-    return classToPlain(this);
   }
 }
