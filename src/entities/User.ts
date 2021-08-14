@@ -1,9 +1,16 @@
 import { IsEmail, Length } from "class-validator";
-import { Entity as TOEntity, Column, Index, BeforeInsert } from "typeorm";
+import {
+  Entity as TOEntity,
+  Column,
+  Index,
+  BeforeInsert,
+  OneToMany,
+} from "typeorm";
 import bcrypt from "bcrypt";
 import { Exclude } from "class-transformer";
 
 import Entity from "./Entity";
+import Post from "./Post";
 
 /**
  * Declared as `ToEntity` due to the naming conflict of the Entity abstract class created
@@ -31,11 +38,13 @@ export default class User extends Entity {
 
   // excludes from response?
   @Exclude()
-  @Index()
+  @Column()
   // 255 - varchar max
   @Length(6, 255)
-  @Column()
   password: string;
+
+  @OneToMany(() => Post, (post) => post.user)
+  posts: Post[];
 
   // hook directive to perform someting before inserted into db
   // hashing password with 6 rounds
