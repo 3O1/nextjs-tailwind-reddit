@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import Post from "../entities/Post";
+import Sub from "../entities/Sub";
 
 import auth from "../middleware/auth";
 
@@ -29,7 +30,14 @@ const createPost = async (req: Request, res: Response) => {
   }
 
   try {
-    // TODO: Find sub
+    /**
+     * Find corresponding sub
+     *
+     * will throw error on its own if there isn't a corresponding sub
+     * UI will be set to make sure this doesn't happen
+     */
+    const subRecord = await Sub.findOneOrFail({ name: sub });
+
     /**
      * Create post inside the try catch block
      *
@@ -41,7 +49,7 @@ const createPost = async (req: Request, res: Response) => {
      *
      * after creating the post object, save to the database & return it
      */
-    const post = new Post({ title, body, user, subName: sub });
+    const post = new Post({ title, body, user, sub: subRecord });
     await post.save();
 
     return res.json(post);
