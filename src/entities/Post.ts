@@ -5,8 +5,10 @@ import {
   BeforeInsert,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from "typeorm";
 import { makeId, sluggify } from "../util/helpers";
+import Comment from "./Comment";
 
 import Entity from "./Entity";
 import Sub from "./Sub";
@@ -58,6 +60,13 @@ export default class Post extends Entity {
   @ManyToOne(() => Sub, (sub) => sub.posts)
   @JoinColumn({ name: "subName", referencedColumnName: "name" })
   sub: Sub;
+
+  /**
+   * Have to setup inverseSide for OneToMany
+   * It's not this table that holds the foreign key
+   */
+  @OneToMany(() => Comment, (comment) => comment.post)
+  comments: Comment[];
 
   /**
    * Function that generates the identifier and slug before the model is inserted into the db.
