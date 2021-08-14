@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import cookie from "cookie";
 
 import { User } from "../entities/User";
+import auth from "../middleware/auth";
 
 const register = async (req: Request, res: Response) => {
   const { email, username, password } = req.body;
@@ -105,41 +106,16 @@ const login = async (req: Request, res: Response) => {
 };
 
 /**
- * /me route
+ * /me route after the middleware, won't reach here if anything in the auth fails
+ *  - have a user if we reach here & return it
  *
- *  user can send request to this route
  *  - lets user know if authenticated & who they are
+ *  @returns the user in the response.locals.object value from the auth middleware
  *
- * @throws {Error('Unathenticated')} if token and/or user is null
  */
 
-const me = async (req: Request, res: Response) => {
-  try {
-    /**
-     * cookie-parser middleware to pass cookies from the request easily
-     */
-    const token = req.cookies.token;
-
-    if (!token) throw new Error("Unathenticated");
-
-    /**
-     * extract username from token
-     *  - throw error if user is not found
-     *  - return user object if no errors/user found
-     */
-    const { username }: any = jwt.verify(token, process.env.JWT_SECRET);
-
-    const user = await User.findOne({ username });
-    if (!user) throw new Error("Unauthorized");
-
-    return res.json(user);
-  } catch (err) {
-    console.log(err);
-    /**
-     * STATUS_CODE 401 = authorization errors
-     */
-    return res.status(401).json({ error: err.message });
-  }
+const me = (_: Request, res: Response) => {
+  return res.json(res.locals.user);
 };
 
 /**
@@ -176,7 +152,12 @@ const logout = (_: Request, res: Response) => {
 const router = Router();
 router.post("/register", register);
 router.post("/login", login);
-router.get("/me", me);
-router.get("/logout", logout);
+/**
+ * passing auth middleare before /me & /logout route
+ *
+ * By passing the auth middleware for the logout, prevents unauthenticated users from making a request to logout
+ */
+router.get("/me", auth, me);
+router.get("/logout", auth, logout);
 
 export default router;
