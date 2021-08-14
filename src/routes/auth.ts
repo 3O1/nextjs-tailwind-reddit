@@ -66,7 +66,7 @@ const login = async (req: Request, res: Response) => {
     }
 
     // sign & return token | secret as base62?
-    const token = jwt.sign({ username }, process.env.JWT_SECRET);
+    const token = jwt.sign({ username }, process.env.JWT_SECRET!);
 
     /**
      * set() used to set headers when sending back a response
@@ -102,7 +102,15 @@ const login = async (req: Request, res: Response) => {
     );
 
     return res.json(user);
-  } catch (err) {}
+  } catch (err) {
+    /**
+     * In prod want to send error to sentry
+     *
+     * Did validation already, if there is an error it's a server error
+     */
+    console.log(err);
+    return res.json({ error: "Something went wrong" });
+  }
 };
 
 /**

@@ -27,7 +27,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
      *  - throw error if user is not found
      *  - return user object if no errors/user found
      */
-    const { username }: any = jwt.verify(token, process.env.JWT_SECRET);
+    const { username }: any = jwt.verify(token, process.env.JWT_SECRET!);
     const user = await User.findOne({ username });
 
     if (!user) throw new Error("Unauthenticated");

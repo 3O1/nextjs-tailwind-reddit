@@ -11,19 +11,19 @@
     // additions
     "esModuleInterop": true,
     // strict stuff
-    // "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
+    // "strict": true, // will enable all strict
+    "noImplicitAny": true, // variable has to have a type
+    "strictNullChecks": true, // can't have value of a variable be null & use it later
+    "strictFunctionTypes": true, // every function has to have a type
     "strictBindCallApply": true,
-    // "strictPropertyInitialization": true,
-    "noImplicitThis": true,
+    // "strictPropertyInitialization": true, // messes with code
+    "noImplicitThis": true, // have to specify this
     // extra
     "alwaysStrict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": true, // can't have variables & not use them
+    "noUnusedParameters": true, // same as noUnusedLocals but for function params
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true // allows us to import JSON files & infer types from their values
   }
 }

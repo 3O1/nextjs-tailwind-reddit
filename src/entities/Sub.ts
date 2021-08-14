@@ -2,13 +2,10 @@ import {
   Entity as TOEntity,
   Column,
   Index,
-  BeforeInsert,
-  In,
   ManyToOne,
   JoinColumn,
   OneToMany,
 } from "typeorm";
-import { makeId, sluggify } from "../util/helpers";
 
 import Entity from "./Entity";
 import Post from "./Post";

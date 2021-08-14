@@ -62,8 +62,30 @@ const createPost = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Gets all the posts, uses the find() method and returns them,
+ * since there are no conditions
+ * 
+ * @param _ `Request` (Omitted)
+ * @param res `Response`
+ * 
+ * Doesn't need auth middleware since it's public
+ *  - anyone can view the posts
+] */
+const getPosts = async (_: Request, res: Response) => {
+  try {
+    const posts = await Post.find();
+
+    return res.json(posts);
+  } catch (err) {
+    console.log(err);
+    return res.json({ err: "Something went wrong" });
+  }
+};
+
 const router = Router();
 
 router.post("/", auth, createPost);
+router.get("/", getPosts);
 
 export default router;
