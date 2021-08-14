@@ -74,12 +74,56 @@ const createPost = async (req: Request, res: Response) => {
 ] */
 const getPosts = async (_: Request, res: Response) => {
   try {
-    const posts = await Post.find();
+    /**
+     * @param {order: {} }
+     *  - define how the posts should be queried
+     * @param {relations: ['table']}
+     *  - adds the corresponding relation to the response
+     *
+     * Removing sub since there is already `subName` on the Post object
+     */
+    const posts = await Post.find({
+      order: { createdAt: "DESC" },
+      // relations: ["sub"],
+    });
 
     return res.json(posts);
   } catch (err) {
     console.log(err);
-    return res.json({ err: "Something went wrong" });
+    return res.status(500).json({ err: "Something went wrong" });
+  }
+};
+
+/**
+ * Gets one post from the database
+ * 
+ * Send the slug & the identifier as part of the url
+ *  - based on those find the post & return it
+] */
+const getPost = async (req: Request, res: Response) => {
+  const { identifier, slug } = req.params;
+  try {
+    /**
+     * Finds one post or fails with the given identifier & slug
+     *
+     * @throws if there is no post, error is thrown
+     *
+     * Add another object to add relations
+     */
+    const post = await Post.findOneOrFail(
+      { identifier, slug },
+      {
+        relations: ["sub"],
+      }
+    );
+
+    return res.json(post);
+  } catch (err) {
+    console.log(err);
+    /**
+     * return STATUS 404 since no post was found with the given identifier or slug
+     */
+    return res.status(404).json({ err: "Post not found" });
   }
 };
 
@@ -87,5 +131,6 @@ const router = Router();
 
 router.post("/", auth, createPost);
 router.get("/", getPosts);
+router.get("/:identifier/:slug", getPost);
 
 export default router;
