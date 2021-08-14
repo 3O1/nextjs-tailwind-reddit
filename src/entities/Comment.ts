@@ -2,14 +2,16 @@ import {
   BeforeInsert,
   Column,
   Entity as TOEntity,
+  Index,
   JoinColumn,
   ManyToOne,
 } from "typeorm";
-import { makeId } from "../util/helpers";
-import Entity from "./Entity";
 
+import Entity from "./Entity";
 import Post from "./Post";
 import User from "./User";
+
+import { makeId } from "../util/helpers";
 
 @TOEntity("comments")
 export default class Comment extends Entity {
@@ -18,6 +20,8 @@ export default class Comment extends Entity {
     Object.assign(this, comment);
   }
 
+  // Add @Index for identifier
+  @Index()
   @Column()
   identifier: string;
 
@@ -35,7 +39,7 @@ export default class Comment extends Entity {
    */
 
   @ManyToOne(() => User)
-  @JoinColumn({ name: "usename", referencedColumnName: "username" })
+  @JoinColumn({ name: "username", referencedColumnName: "username" })
   user: User;
 
   /**
@@ -43,8 +47,12 @@ export default class Comment extends Entity {
    *
    * Joins on the primary column (id) -> omit the @JoinColumn
    *  - will produce a post id field
+   *
+   * @param {nullable: false} don't want post id to be nullable
    */
-  @ManyToOne(() => Post, (post) => post.comments)
+  @ManyToOne(() => Post, (post) => post.comments, {
+    nullable: false,
+  })
   post: Post;
 
   @BeforeInsert()

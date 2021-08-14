@@ -1,4 +1,5 @@
 import { Router, Request, Response } from "express";
+import Comment from "../entities/Comment";
 import Post from "../entities/Post";
 import Sub from "../entities/Sub";
 
@@ -126,11 +127,50 @@ const getPost = async (req: Request, res: Response) => {
     return res.status(404).json({ err: "Post not found" });
   }
 };
+/**
+ * Send details on what post to comment on
+ * @param {req} content of the comment we want to send
+ */
+const commentOnPost = async (req: Request, res: Response) => {
+  const { identifier, slug } = req.params;
+
+  const body = req.body.body;
+
+  try {
+    /**
+     * Fetch post first
+     * @throws if no post is found
+     */
+    const post = await Post.findOneOrFail({ identifier, slug });
+
+    /**
+     * Create new comment object
+     * @param body: comment body from req
+     * @param user: current user from auth middleware
+     * @param post: post which the comment is commenting on
+     */
+    const comment = new Comment({
+      body,
+      user: res.locals.user,
+      post,
+    });
+
+    await comment.save();
+    return res.json(comment);
+  } catch (err) {
+    /**
+     * Most likely will only get post not found error
+     */
+    console.log(err);
+    return res.status(404).json({ error: "Post not found" });
+  }
+};
 
 const router = Router();
 
 router.post("/", auth, createPost);
 router.get("/", getPosts);
 router.get("/:identifier/:slug", getPost);
+router.post("/:identifier/:slug/comments", auth, commentOnPost);
 
 export default router;
