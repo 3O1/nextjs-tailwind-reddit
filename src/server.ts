@@ -25,7 +25,21 @@ app.use(express.json());
 app.use(morgan("dev"));
 app.use(trim);
 app.use(cookieParser());
-app.use(cors());
+/**
+ * @param credentials:
+ * When setting `credentials` to `true`, need to specify an origin or list of origins
+ *
+ * @param origin: In prod, set to domain name
+ * @param optionsSuccessStatus Status of the request before the request is sent
+ *  - setting to `200` is best for browser compatibility for older browsers/devices
+ */
+app.use(
+  cors({
+    credentials: true,
+    origin: process.env.ORIGIN,
+    optionsSuccessStatus: 200,
+  })
+);
 
 app.get("/", (_, res) => {
   res.send("hello world");
