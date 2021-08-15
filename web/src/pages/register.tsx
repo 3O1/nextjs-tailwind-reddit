@@ -1,7 +1,38 @@
+import { FormEvent, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
+import Axios from "axios";
 
 export default function Register() {
+  /**
+   * Already initializing it as a string -> infers it's a string
+   */
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [agreement, setAgreement] = useState(false);
+  const [errors, setErrors] = useState<any>({});
+
+  const submitForm = async (event: FormEvent) => {
+    /**
+     * @function preventDefault{} so the page isn't reloaded or add them as query strings
+     */
+    event.preventDefault();
+
+    try {
+      const res = await Axios.post("/auth/register", {
+        email,
+        password,
+        username,
+      });
+
+      console.log(res.data);
+    } catch (err) {
+      console.log(err);
+      setErrors(err.response.data);
+    }
+  };
+
   return (
     <div className="flex">
       <Head>
@@ -11,7 +42,7 @@ export default function Register() {
       </Head>
 
       <div
-        className="w-40 h-screen bg-center bg-cover"
+        className="h-screen bg-center bg-cover w-36"
         style={{ backgroundImage: "url('/img/bg.jpeg')" }}
       ></div>
 
@@ -22,12 +53,14 @@ export default function Register() {
             By continuing, you agree to our User Agreement and Privacy Policy
           </p>
 
-          <form>
+          <form onSubmit={submitForm}>
             <div className="mb-6">
               <input
                 type="checkbox"
                 className="mr-1 cursor-pointer"
                 id="agreement"
+                checked={agreement}
+                onChange={(e) => setAgreement(e.target.checked)}
               />
               <label className="text-xs cursor-pointer" htmlFor="agreement">
                 I agree to get emails about cool stuff on Reddit
@@ -37,24 +70,28 @@ export default function Register() {
             <div className="mb-2">
               <input
                 type="email"
-                className="w-full px-3 py-2 bg-gray-100 border border-gray-400 rounded"
+                className="w-full p-3 transition duration-200 border border-gray-300 rounded outline-none bg-gray-50 focus:bg-white hover:bg-white"
                 placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
             <div className="mb-2">
               <input
                 type="text"
-                className="w-full px-3 py-2 bg-gray-100 border border-gray-400 rounded"
+                className="w-full p-3 transition duration-200 border border-gray-300 rounded outline-none bg-gray-50 focus:bg-white hover:bg-white"
                 placeholder="Username"
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
 
             <div className="mb-2">
               <input
                 type="password"
-                className="w-full px-3 py-2 bg-gray-100 border border-gray-400 rounded"
+                className="w-full p-3 transition duration-200 border border-gray-300 rounded outline-none bg-gray-50 focus:bg-white hover:bg-white"
                 placeholder="Password"
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <button className="w-full py-2 mb-4 text-xs font-bold text-white uppercase bg-blue-500 border border-blue-500 rounded">
