@@ -2,6 +2,8 @@ import { FormEvent, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import Axios from "axios";
+import InputGroup from "../components/inputGroup";
+import { useRouter } from "next/router";
 
 export default function Register() {
   /**
@@ -13,20 +15,36 @@ export default function Register() {
   const [agreement, setAgreement] = useState(false);
   const [errors, setErrors] = useState<any>({});
 
+  const router = useRouter();
+
   const submitForm = async (event: FormEvent) => {
     /**
      * @function preventDefault{} so the page isn't reloaded or add them as query strings
+     *
+     * Add onto existing errors if button pressed and agreement is set to false
+     *
+     * Redirect when successful using the next router
      */
     event.preventDefault();
 
+    if (!agreement) {
+      setErrors({
+        ...errors,
+        agreement: "You must agree to get emails about cool stuff on reddit",
+      });
+      return;
+    }
+
     try {
-      const res = await Axios.post("/auth/register", {
+      await Axios.post("/auth/register", {
         email,
         password,
         username,
       });
 
-      console.log(res.data);
+      // console.log(res.data);
+
+      router.push("/login");
     } catch (err) {
       console.log(err);
       setErrors(err.response.data);
@@ -65,35 +83,38 @@ export default function Register() {
               <label className="text-xs cursor-pointer" htmlFor="agreement">
                 I agree to get emails about cool stuff on Reddit
               </label>
+              <small className="block font-medium text-red-600 ">
+                {errors.agreement}
+              </small>
             </div>
 
-            <div className="mb-2">
-              <input
-                type="email"
-                className="w-full p-3 transition duration-200 border border-gray-300 rounded outline-none bg-gray-50 focus:bg-white hover:bg-white"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
+            <InputGroup
+              className="mb-2"
+              type="email"
+              value={email}
+              setValue={setEmail}
+              placeholder="EMAIL"
+              error={errors.email}
+            />
 
-            <div className="mb-2">
-              <input
-                type="text"
-                className="w-full p-3 transition duration-200 border border-gray-300 rounded outline-none bg-gray-50 focus:bg-white hover:bg-white"
-                placeholder="Username"
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </div>
+            <InputGroup
+              className="mb-2"
+              type="text"
+              value={username}
+              setValue={setUsername}
+              placeholder="USERNAME"
+              error={errors.username}
+            />
 
-            <div className="mb-2">
-              <input
-                type="password"
-                className="w-full p-3 transition duration-200 border border-gray-300 rounded outline-none bg-gray-50 focus:bg-white hover:bg-white"
-                placeholder="Password"
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+            <InputGroup
+              className="mb-4"
+              type="password"
+              value={password}
+              setValue={setPassword}
+              placeholder="PASSWORD"
+              error={errors.password}
+            />
+
             <button className="w-full py-2 mb-4 text-xs font-bold text-white uppercase bg-blue-500 border border-blue-500 rounded">
               Sign up
             </button>
