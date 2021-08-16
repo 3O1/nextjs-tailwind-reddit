@@ -86,8 +86,11 @@ const vote = async (req: Request, res: Response) => {
 
     post = await Post.findOneOrFail(
       { identifier, slug },
-      { relations: ["comments", "sub", "votes"] }
+      { relations: ["comments", "comments.votes", "sub", "votes"] }
     );
+
+    post.setUserVote(user);
+    post.comments.forEach((c) => c.setUserVote(user));
 
     return res.json(post);
   } catch (err) {

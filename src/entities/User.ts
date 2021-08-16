@@ -11,6 +11,7 @@ import { Exclude } from "class-transformer";
 
 import Entity from "./Entity";
 import Post from "./Post";
+import Vote from "./Vote";
 
 /**
  * Declared as `ToEntity` due to the naming conflict of the Entity abstract class created
@@ -46,6 +47,9 @@ export default class User extends Entity {
 
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
+
+  @OneToMany(() => Vote, (vote) => vote.user)
+  votes: Vote[];
 
   // hook directive to perform someting before inserted into db
   // hashing password with 6 rounds

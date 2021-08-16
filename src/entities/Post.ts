@@ -1,4 +1,4 @@
-import { Expose } from "class-transformer";
+import { Exclude, Expose } from "class-transformer";
 import {
   Entity as TOEntity,
   Column,
@@ -74,6 +74,7 @@ export default class Post extends Entity {
   @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
 
+  @Exclude()
   @OneToMany(() => Vote, (vote) => vote.post)
   votes: Vote[];
 
@@ -83,6 +84,24 @@ export default class Post extends Entity {
    */
   @Expose() get url(): string {
     return `/r/${this.subName}/${this.identifier}/${this.slug}`;
+  }
+
+  /**
+   * Adds the number of comments in a post
+   * @returns `number`
+   *
+   */
+  @Expose() get commentCount(): number {
+    return this.comments?.length;
+  }
+
+  /**
+   * Count up the votes & return the voteScore
+   * @returns `number`
+   */
+
+  @Expose() get voteScore(): number {
+    return this.votes?.reduce((prev, curr) => prev + (curr.value || 0), 0);
   }
 
   /**
@@ -97,6 +116,20 @@ export default class Post extends Entity {
   // createFields() {
   //   this.url = `/r/${this.subName}/${this.identifier}/${this.slug}`;
   // }
+
+  protected userVote: number;
+  setUserVote(user: User) {
+    /**
+     * Check votes submitted to this post & votes this user submitted
+     *  - find intersection between them
+     *  - find index of the vote where the votes' username = the current user
+     *
+     * If there isn't a vote -> show UI as if user hasn't voted yet
+     */
+
+    const index = this.votes?.findIndex((v) => v.username === user.username);
+    this.userVote = index > -1 ? this.votes[index].value : 0;
+  }
 
   /**
    * Function that generates the identifier and slug before the model is inserted into the db.
