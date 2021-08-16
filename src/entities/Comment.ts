@@ -5,11 +5,13 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
 } from "typeorm";
 
 import Entity from "./Entity";
 import Post from "./Post";
 import User from "./User";
+import Vote from "./Vote";
 
 import { makeId } from "../util/helpers";
 
@@ -54,6 +56,9 @@ export default class Comment extends Entity {
     nullable: false,
   })
   post: Post;
+
+  @OneToMany(() => Vote, (vote) => vote.comment)
+  votes: Vote[];
 
   @BeforeInsert()
   makeIdAndSlug() {

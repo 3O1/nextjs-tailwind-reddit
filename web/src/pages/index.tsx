@@ -6,8 +6,6 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 import { Post } from "../types";
-import { redirect } from "next/dist/server/api-utils";
-import { GetServerSideProps } from "next";
 
 dayjs.extend(relativeTime);
 
@@ -104,20 +102,12 @@ export default function Home() {
  * can render it with the fetched data oppose to client side rendering
  *
  */
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const res = await fetch(`http:/.../`);
-  const data = await res.json();
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//   try {
+//     const res = await axios.get("/posts");
 
-  if (!data) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: {}, // will be passed to the page component as props
-  };
-};
+//     return { props: { posts: res.data } };
+//   } catch (err) {
+//     return { props: { error: "Something went wrong" } };
+//   }
+// };

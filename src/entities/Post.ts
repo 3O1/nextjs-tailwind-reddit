@@ -15,6 +15,7 @@ import Comment from "./Comment";
 import Entity from "./Entity";
 import Sub from "./Sub";
 import User from "./User";
+import Vote from "./Vote";
 
 /**
  * Declared as `ToEntity` due to the naming conflict of the Entity abstract class created
@@ -72,6 +73,9 @@ export default class Post extends Entity {
    */
   @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
+
+  @OneToMany(() => Vote, (vote) => vote.comment)
+  votes: Vote[];
 
   /**
    * getter that returns a string - using class-transformer
