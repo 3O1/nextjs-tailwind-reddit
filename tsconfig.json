@@ -20,7 +20,7 @@
     "noImplicitThis": true, // have to specify this
     // extra
     "alwaysStrict": true,
-    "noUnusedLocals": true, // can't have variables & not use them
+    // "noUnusedLocals": true, // can't have variables & not use them
     "noUnusedParameters": true, // same as noUnusedLocals but for function params
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,

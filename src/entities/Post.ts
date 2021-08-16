@@ -1,3 +1,4 @@
+import { Expose } from "class-transformer";
 import {
   Entity as TOEntity,
   Column,
@@ -6,6 +7,7 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  AfterLoad,
 } from "typeorm";
 import { makeId, sluggify } from "../util/helpers";
 import Comment from "./Comment";
@@ -54,6 +56,9 @@ export default class Post extends Entity {
   @JoinColumn({ name: "username", referencedColumnName: "username" })
   user: User;
 
+  @Column()
+  username: string;
+
   /**
    * References {name} on the sub table
    */
@@ -67,6 +72,27 @@ export default class Post extends Entity {
    */
   @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
+
+  /**
+   * getter that returns a string - using class-transformer
+   * evquivalent to the virual @AfterLoad()
+   */
+  @Expose() get url(): string {
+    return `/r/${this.subName}/${this.identifier}/${this.slug}`;
+  }
+
+  /**
+   * Used to generate the URL for each post
+
+   * virtual fields
+   *  - can't be edited outside the instance
+   * 
+   */
+  // protected url: string;
+  // @AfterLoad()
+  // createFields() {
+  //   this.url = `/r/${this.subName}/${this.identifier}/${this.slug}`;
+  // }
 
   /**
    * Function that generates the identifier and slug before the model is inserted into the db.
