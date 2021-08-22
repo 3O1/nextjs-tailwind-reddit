@@ -5,7 +5,7 @@ import Axios from "axios";
 import InputGroup from "../components/inputGroup";
 import { useRouter } from "next/router";
 
-import { useAuthDispatch } from "../context/auth";
+import { useAuthDispatch, useAuthState } from "../context/auth";
 
 export default function Login() {
   /**
@@ -16,8 +16,13 @@ export default function Login() {
   const [errors, setErrors] = useState<any>({});
 
   const dispatch = useAuthDispatch();
+  const { authenticated } = useAuthState();
 
   const router = useRouter();
+  /**
+   * If user is authenticated -> redirect to home page
+   */
+  if (authenticated) router.push("/");
 
   const submitForm = async (event: FormEvent) => {
     event.preventDefault();
@@ -39,7 +44,7 @@ export default function Login() {
       /**
        * Passing the response data and type to dispatch
        */
-      dispatch({ type: "LOGIN", payload: res.data });
+      dispatch("LOGIN", res.data);
 
       router.push("/");
     } catch (err) {

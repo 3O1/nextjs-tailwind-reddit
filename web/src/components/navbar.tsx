@@ -8,7 +8,7 @@ import { useAuthState, useAuthDispatch } from "../context/auth";
 import RedditLogo from "../../public/img/reddit.svg";
 
 const Navbar: React.FC = () => {
-  const { authenticated } = useAuthState();
+  const { authenticated, loading } = useAuthState();
   const dispatch = useAuthDispatch();
 
   const logout = () => {
@@ -23,7 +23,7 @@ const Navbar: React.FC = () => {
          * Dispatch the logout type and reload the entire page
          *  - helps by having to change the state & refetching
          */
-        dispatch({ type: "LOGOUT" });
+        dispatch("LOGOUT");
         window.location.reload();
       })
       .catch((err) => console.log(err));
@@ -53,27 +53,28 @@ const Navbar: React.FC = () => {
       </div>
       {/* login / signup */}
       <div className="flex">
-        {authenticated ? (
-          // show logout button
-          <button
-            className="w-32 py-1 mr-4 leading-5 hollow blue button"
-            onClick={logout}
-          >
-            Logout
-          </button>
-        ) : (
-          <Fragment>
-            <Link href="/login">
-              <a className="w-32 py-1 mr-4 leading-5 hollow blue button">
-                log in
-              </a>
-            </Link>
+        {!loading &&
+          (authenticated ? (
+            // show logout button
+            <button
+              className="w-32 py-1 mr-4 leading-5 hollow blue button"
+              onClick={logout}
+            >
+              Logout
+            </button>
+          ) : (
+            <Fragment>
+              <Link href="/login">
+                <a className="w-32 py-1 mr-4 leading-5 hollow blue button">
+                  log in
+                </a>
+              </Link>
 
-            <Link href="/register">
-              <a className="w-32 py-1 leading-5 blue button">sign up</a>
-            </Link>
-          </Fragment>
-        )}
+              <Link href="/register">
+                <a className="w-32 py-1 leading-5 blue button">sign up</a>
+              </Link>
+            </Fragment>
+          ))}
       </div>
     </div>
   );

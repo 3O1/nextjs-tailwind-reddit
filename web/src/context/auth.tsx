@@ -1,4 +1,5 @@
-import { createContext, useContext, useReducer } from "react";
+import Axios from "axios";
+import { createContext, useContext, useEffect, useReducer } from "react";
 import { User } from "../types";
 
 /**
@@ -7,6 +8,7 @@ import { User } from "../types";
 interface State {
   authenticated: boolean;
   user: User | undefined;
+  loading: boolean;
 }
 
 /**
@@ -20,6 +22,7 @@ interface Action {
 const StateContext = createContext<State>({
   authenticated: false,
   user: null,
+  loading: true,
 });
 
 const DispatchContext = createContext(null);
@@ -65,6 +68,12 @@ const reducer = (state: State, { type, payload }: Action) => {
         user: null,
       };
 
+    case "STOP_LOADING":
+      return {
+        ...state,
+        loading: false,
+      };
+
     /**
      * when an action is dispatched, will see an error
      * @throws Unknown action type
@@ -79,10 +88,44 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
    * Call the useReducer hook
    */
 
-  const [state, dispatch] = useReducer(reducer, {
+  /**
+   * If loading -> don't show buttons
+   * If false -> done loading & check auth to show which buttons
+   */
+  const [state, defaultDispatch] = useReducer(reducer, {
     user: null,
     authenticated: false,
+    loading: true,
   });
+
+  /**
+   * calls the default dispatch
+   *  - saves the hassle of passing an object
+   *
+   */
+  const dispatch = (type: string, payload?: any) =>
+    defaultDispatch({ type, payload });
+
+  /** Fetch user data on load
+   *
+   * Declare and call function loadUser()
+   */
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const res = await Axios.get("/auth/me");
+        dispatch("LOGIN", res.data);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        dispatch("STOP_LOADING");
+      }
+    }
+    loadUser();
+    /** Pass empty array of dependencies to useEffect
+     *  want to use only one in the beginning
+     */
+  }, []);
 
   return (
     <DispatchContext.Provider value={dispatch}>
