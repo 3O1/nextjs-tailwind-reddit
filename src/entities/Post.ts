@@ -71,6 +71,7 @@ export default class Post extends Entity {
    * Have to setup inverseSide for OneToMany
    * It's not this table that holds the foreign key
    */
+  @Exclude()
   @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
 

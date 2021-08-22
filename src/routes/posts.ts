@@ -82,10 +82,11 @@ const getPosts = async (_: Request, res: Response) => {
      *  - adds the corresponding relation to the response
      *
      * Removing sub since there is already `subName` on the Post object
+     *
      */
     const posts = await Post.find({
       order: { createdAt: "DESC" },
-      // relations: ["sub"],
+      relations: ["comments", "votes", "sub"],
     });
 
     return res.json(posts);
