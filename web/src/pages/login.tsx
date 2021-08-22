@@ -5,6 +5,8 @@ import Axios from "axios";
 import InputGroup from "../components/inputGroup";
 import { useRouter } from "next/router";
 
+import { useAuthDispatch } from "../context/auth";
+
 export default function Login() {
   /**
    * Already initializing it as a string -> infers it's a string
@@ -13,13 +15,15 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<any>({});
 
+  const dispatch = useAuthDispatch();
+
   const router = useRouter();
 
   const submitForm = async (event: FormEvent) => {
     event.preventDefault();
 
     try {
-      await Axios.post(
+      const res = await Axios.post(
         "/auth/login",
         {
           password,
@@ -32,7 +36,10 @@ export default function Login() {
         // { withCredentials: true }
       );
 
-      // console.log(res.data);
+      /**
+       * Passing the response data and type to dispatch
+       */
+      dispatch({ type: "LOGIN", payload: res.data });
 
       router.push("/");
     } catch (err) {
