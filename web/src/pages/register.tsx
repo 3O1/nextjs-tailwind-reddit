@@ -26,7 +26,6 @@ export default function Register() {
      * @function preventDefault{} so the page isn't reloaded or add them as query strings
      *
      * Add onto existing errors if button pressed and agreement is set to false
-     *
      * Redirect when successful using the next router
      */
     event.preventDefault();
@@ -45,8 +44,6 @@ export default function Register() {
         password,
         username,
       });
-
-      // console.log(res.data);
 
       router.push("/login");
     } catch (err) {
