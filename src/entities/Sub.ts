@@ -51,6 +51,9 @@ export default class Sub extends Entity {
   @Column({ nullable: true })
   bannerUrn: string;
 
+  @Column()
+  username: string;
+
   /**
    * Sub belongs to a User that created it
    *

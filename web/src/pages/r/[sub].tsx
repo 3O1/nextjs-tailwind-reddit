@@ -12,7 +12,10 @@ export default function Sub() {
    *
    * can do conditional fetching
    */
-  const { data: sub } = useSWR(subName ? `/subs/${subName}` : null);
+  const { data: sub, error } = useSWR(subName ? `/subs/${subName}` : null);
+
+  /** If there's an error, redirect to home */
+  if (error) router.push("/");
 
   let postsMarkup;
   if (!sub) {
