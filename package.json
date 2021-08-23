@@ -41,7 +41,7 @@
     "server": "nodemon --exec ts-node src/server.ts",
     "web": "cd web && npm run dev",
     "typeorm": "ts-node ./node_modules/typeorm/cli.js",
-    "dev": "concurrently \"npm run server\" \"npm run web\" --names server,web",
+    "dev": "nodemon --exec ts-node src/server.ts",
     "seed": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed"
   }
 }
