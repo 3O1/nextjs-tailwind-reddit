@@ -6,6 +6,7 @@ export interface Post {
   subName: string;
   createdAt: string;
   updatedAt: string;
+  sub?: Sub;
   username: string;
   // virual fields
   url: string;

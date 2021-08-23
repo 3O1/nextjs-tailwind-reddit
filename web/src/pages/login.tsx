@@ -43,10 +43,13 @@ export default function Login() {
 
       /**
        * Passing the response data and type to dispatch
+       *
+       * pushes to previous page not home
        */
       dispatch("LOGIN", res.data);
 
-      router.push("/");
+      // router.push("/");
+      router.back();
     } catch (err) {
       console.log(err);
       setErrors(err.response.data);
