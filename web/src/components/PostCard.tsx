@@ -6,14 +6,7 @@ import Axios from "axios";
 import classNames from "classnames";
 
 import { Post } from "../types";
-
-const ActionButton = ({ children }) => {
-  return (
-    <div className="px-1 py-1 mr-1 text-xs text-gray-400 rounded cursor-pointer hover:bg-gray-200">
-      {children}
-    </div>
-  );
-};
+import ActionButton from "./ActionButton";
 
 dayjs.extend(relativeTime);
 
@@ -94,7 +87,7 @@ export default function PostCard({
             <span className="mx-1">•</span>
             Posted by
             <Link href={`/u/${username}`}>
-              <a className="mx-1 hover:underline">/u/{username}</a>
+              <a className="mx-1 hover:underline">u/{username}</a>
             </Link>
             <Link href={url}>
               <a className="mx-1 hover:underline">
