@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { isEmpty } from "class-validator";
 import { getRepository } from "typeorm";
-import multer from "multer";
+import multer, { FileFilterCallback } from "multer";
 import path from "path";
+import fs from "fs";
 
 import User from "../entities/User";
 import Sub from "../entities/Sub";
-
 import auth from "../middleware/auth";
 import user from "../middleware/user";
 import Post from "../entities/Post";
@@ -145,7 +145,7 @@ const upload = multer({
       callback(null, name + path.extname(file.originalname)); // e.g. xcv923nlsiqg23kf + .png
     },
   }),
-  fileFilter: (_, file: any, callback: multer.FileFilterCallback) => {
+  fileFilter: (_, file: any, callback: FileFilterCallback) => {
     /**
      * Check if file is an image
      */
@@ -157,8 +157,42 @@ const upload = multer({
   },
 });
 
-const uploadSubImage = async (_: Request, res: Response) => {
-  res.json({ success: true });
+const uploadSubImage = async (req: Request, res: Response) => {
+  const sub: Sub = res.locals.sub;
+  try {
+    const type = req.body.type;
+
+    if (type !== "image" && type !== "banner") {
+      fs.unlinkSync(req.file?.path ?? "");
+      return res.status(400).json({ error: "Invalid type" });
+    }
+
+    /**
+     * 
+     * Update record
+
+     * Check if it's the image or banner
+     */
+
+    let oldImageUrn: string = "";
+
+    if (type === "image") {
+      sub.imageUrn = req.file?.filename ?? "";
+      oldImageUrn = sub.imageUrn ?? "";
+    } else if (type === "banner") {
+      sub.bannerUrn = req.file?.filename ?? "";
+      oldImageUrn = sub.bannerUrn ?? "";
+    }
+    await sub.save();
+
+    if (oldImageUrn !== "") {
+      fs.unlinkSync(oldImageUrn);
+    }
+
+    return res.json(sub);
+  } catch (err) {
+    return res.status(500).json({ error: "Something went wrong" });
+  }
 };
 
 const router = Router();
